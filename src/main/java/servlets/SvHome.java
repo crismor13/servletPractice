@@ -1,41 +1,42 @@
 package servlets;
 
 import jakarta.servlet.ServletException;
+
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+
+import models.Product;
+import models.Sale;
+import DAO.*;
 
 /**
  * Servlet implementation class SvHome
  */
-@WebServlet("/SvHome")
+@WebServlet(name = "SvHome", urlPatterns = {"/home"})
 public class SvHome extends HttpServlet {
+	/**
+	 * 
+	 */
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public SvHome() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
-	}
+        // Fetch the necessary data for the dashboard (products overview, sales overview, notifications, etc.)
+		
+		ProductDaoImp productDao = new ProductDaoImp();
+		SaleDaoImp saleDao = new SaleDaoImp();
+		
+        List<Product> lowStockProducts = productDao.getLowStockProducts();
+        List<Sale> recentSales = saleDao.getMostRecentSales();
+        
+        request.setAttribute("lowStockProducts", lowStockProducts);
+        request.setAttribute("recentSales", recentSales);
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
-	}
+        // Forward to the home.jsp page
+        request.getRequestDispatcher("home.jsp").forward(request, response);
+    }
 
 }
